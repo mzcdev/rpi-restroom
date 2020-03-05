@@ -69,7 +69,7 @@ _start() {
 
     rm -rf nohup.out
 
-    _command "nohup python3 sonic.py &"
+    _command "nohup python3 sonic.py > log.out 2>&1 &"
     nohup python3 sonic.py &
 
     _status
@@ -78,7 +78,7 @@ _start() {
 }
 
 _log() {
-    tail -f ${SHELL_DIR}/nohup.out
+    tail -f ${SHELL_DIR}/log.out
 }
 
 _config_read() {
