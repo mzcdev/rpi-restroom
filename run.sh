@@ -100,9 +100,8 @@ _init() {
 
 case ${CMD} in
     init)
-        _stop
         _init
-        _start
+        _status
         ;;
     status)
         _status
