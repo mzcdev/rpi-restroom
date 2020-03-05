@@ -32,6 +32,6 @@ try:
         distance = pulse_duration * 17000
         distance = round(distance, 2)
 
-        print("Distance : ", distance, "cm")
+        print("Distance", distance, "cm")
 except:
     gpio.cleanup()
