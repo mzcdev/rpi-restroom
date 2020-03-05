@@ -44,8 +44,16 @@ _error() {
     exit 1
 }
 
-_stop() {
+_status() {
     PID=$(ps -ef | grep python3 | grep " sonic[.]py" | head -1 | awk '{print $2}' | xargs)
+    if [ "${PID}" != "" ]; then
+        _result "rpi-restroom is running: ${PID}"
+    else
+        _result "rpi-restroom is stopped"
+    fi
+}
+
+_stop() {
     if [ "${PID}" != "" ]; then
         _command "kill -9 ${PID}"
         kill -9 ${PID}
@@ -59,11 +67,6 @@ _start() {
 
     _command "nohup python3 sonic.py &"
     nohup python3 sonic.py &
-
-    PID=$(ps -ef | grep python3 | grep " sonic[.]py" | head -1 | awk '{print $2}' | xargs)
-    if [ "{PID}" != "" ]; then
-        _result "rpi-rek started: ${PID}"
-    fi
 
     popd
 }
@@ -101,11 +104,19 @@ case ${CMD} in
         _init
         _start
         ;;
+    status)
+        _status
+        ;;
     start)
+        _status
         _stop
+        _status
         _start
+        _status
         ;;
     stop)
+        _status
         _stop
+        _status
         ;;
 esac
