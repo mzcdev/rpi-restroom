@@ -54,27 +54,28 @@ _status() {
 }
 
 _stop() {
-    _status
-
-    if [ "${PID}" != "" ]; then
-        _command "kill -9 ${PID}"
-        kill -9 ${PID}
-
-        _status
+    if [ "${PID}" == "" ]; then
+        return
     fi
+
+    _command "kill -9 ${PID}"
+    kill -9 ${PID}
+
+    _status
 }
 
 _start() {
+    if [ "${PID}" != "" ]; then
+        return
+    fi
+
     pushd ${SHELL_DIR}
-
-    rm -rf nohup.out
-
-    _command "nohup python3 sonic.py > log.out 2>&1 &"
-    nohup python3 sonic.py > log.out 2>&1 &
+    _command "python3 sonic.py"
+    # nohup python3 sonic.py > log.out 2>&1 &
+    nohup python3 sonic.py > /dev/null 2>&1 &
+    popd
 
     _status
-
-    popd
 }
 
 _log() {
@@ -82,19 +83,19 @@ _log() {
 }
 
 _config_read() {
-    if [ -z ${SCAN_SHELL} ]; then
-        _read "SCAN_SHELL [${SCAN_SHELL}]: " "${SCAN_SHELL}"
+    if [ -z ${REMOTE_URL} ]; then
+        _read "REMOTE_URL [${REMOTE_URL}]: " "${REMOTE_URL}"
         if [ ! -z ${ANSWER} ]; then
-            SCAN_SHELL="${ANSWER}"
+            REMOTE_URL="${ANSWER}"
         fi
     fi
 
-    export SCAN_SHELL="${SCAN_SHELL}"
+    export REMOTE_URL="${REMOTE_URL}"
 }
 
 _config_save() {
-    echo "# rpi-rek config" > ${CONFIG}
-    echo "export SCAN_SHELL=${SCAN_SHELL}" >> ${CONFIG}
+    echo "# rpi-restroom config" > ${CONFIG}
+    echo "export REMOTE_URL=${REMOTE_URL}" >> ${CONFIG}
 
     cat ${CONFIG}
 }
@@ -111,6 +112,7 @@ _init() {
 case ${CMD} in
     init)
         _init
+        _status
         _stop
         _start
         ;;
@@ -118,10 +120,12 @@ case ${CMD} in
         _status
         ;;
     start)
+        _status
         _stop
         _start
         ;;
     stop)
+        _status
         _stop
         ;;
     log)
