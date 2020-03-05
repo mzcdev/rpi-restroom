@@ -77,6 +77,10 @@ _start() {
     popd
 }
 
+_log() {
+    tail -f ${SHELL_DIR}/nohup.out
+}
+
 _config_read() {
     if [ -z ${SCAN_SHELL} ]; then
         _read "SCAN_SHELL [${SCAN_SHELL}]: " "${SCAN_SHELL}"
@@ -119,5 +123,8 @@ case ${CMD} in
         ;;
     stop)
         _stop
+        ;;
+    log)
+        _log
         ;;
 esac
