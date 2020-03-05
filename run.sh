@@ -70,7 +70,7 @@ _start() {
     rm -rf nohup.out
 
     _command "nohup python3 sonic.py > log.out 2>&1 &"
-    nohup python3 sonic.py &
+    nohup python3 sonic.py > log.out 2>&1 &
 
     _status
 
