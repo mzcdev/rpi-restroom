@@ -54,9 +54,13 @@ _status() {
 }
 
 _stop() {
+    _status
+
     if [ "${PID}" != "" ]; then
         _command "kill -9 ${PID}"
         kill -9 ${PID}
+
+        _status
     fi
 }
 
@@ -67,6 +71,8 @@ _start() {
 
     _command "nohup python3 sonic.py &"
     nohup python3 sonic.py &
+
+    _status
 
     popd
 }
@@ -101,25 +107,17 @@ _init() {
 case ${CMD} in
     init)
         _init
-        _status
         _stop
-        _status
         _start
-        _status
         ;;
     status)
         _status
         ;;
     start)
-        _status
         _stop
-        _status
         _start
-        _status
         ;;
     stop)
-        _status
         _stop
-        _status
         ;;
 esac
