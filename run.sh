@@ -102,6 +102,10 @@ case ${CMD} in
     init)
         _init
         _status
+        _stop
+        _status
+        _start
+        _status
         ;;
     status)
         _status
