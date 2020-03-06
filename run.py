@@ -6,9 +6,9 @@ import RPi.GPIO as gpio
 
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
-    p.add_argument("--trigger", default=17, help="trigger")
-    p.add_argument("--echo", default=27, help="echo")
-    p.add_argument("--interval", default=0.5, help="interval")
+    p.add_argument("--trigger", type=None, default=17, help="trigger")
+    p.add_argument("--echo", type=None, default=27, help="echo")
+    p.add_argument("--interval", type=float, default=0.5, help="interval")
 
 
 def main():
