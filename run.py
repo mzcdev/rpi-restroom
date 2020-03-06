@@ -38,7 +38,7 @@ def put_item(args, distance):
 
     try:
         res = tbl.put_item(
-            Item={"room_id": args.room_id, "distance": distance, "latest": latest}
+            Item={"room_id": args.room_id, "distance": int(distance), "latest": latest}
         )
     except Exception as ex:
         print("Error:", ex, ROOM_ID, distance)
