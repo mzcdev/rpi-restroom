@@ -41,7 +41,7 @@ def put_item(args, distance):
             Item={"room_id": args.room_id, "distance": distance, "latest": latest}
         )
     except Exception as ex:
-        print("Error:", ex, DEVICE_ID, distance)
+        print("Error:", ex, ROOM_ID, distance)
         res = []
 
     print("put_item", res)
