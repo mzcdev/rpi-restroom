@@ -1,10 +1,12 @@
 #!/bin/bash
 
+NAME="rpi-restroom"
+
 SHELL_DIR=$(dirname $0)
 
-CMD=${1:-init}
+CMD=${1}
 
-CONFIG=~/.rpi-restroom
+CONFIG=~/.${NAME}
 touch ${CONFIG}
 . ${CONFIG}
 
@@ -45,11 +47,11 @@ _error() {
 }
 
 _status() {
-    PID=$(ps -ef | grep python3 | grep " sonic[.]py" | head -1 | awk '{print $2}' | xargs)
+    PID=$(ps -ef | grep python3 | grep " run[.]py" | head -1 | awk '{print $2}' | xargs)
     if [ "${PID}" != "" ]; then
-        _result "rpi-restroom is running: ${PID}"
+        _result "${NAME} is running: ${PID}"
     else
-        _result "rpi-restroom is stopped"
+        _result "${NAME} is stopped"
     fi
 }
 
@@ -70,16 +72,12 @@ _start() {
     fi
 
     pushd ${SHELL_DIR}
-    _command "python3 sonic.py"
-    # nohup python3 sonic.py > log.out 2>&1 &
-    nohup python3 sonic.py > /dev/null 2>&1 &
+    _command "python3 run.py"
+    # nohup python3 run.py > log.out 2>&1 &
+    nohup python3 run.py > /dev/null 2>&1 &
     popd
 
     _status
-}
-
-_log() {
-    tail -f ${SHELL_DIR}/log.out
 }
 
 _config_read() {
@@ -89,12 +87,11 @@ _config_read() {
             REMOTE_URL="${ANSWER}"
         fi
     fi
-
     export REMOTE_URL="${REMOTE_URL}"
 }
 
 _config_save() {
-    echo "# rpi-restroom config" > ${CONFIG}
+    echo "# ${NAME} config" > ${CONFIG}
     echo "export REMOTE_URL=${REMOTE_URL}" >> ${CONFIG}
 
     cat ${CONFIG}
@@ -113,13 +110,16 @@ case ${CMD} in
     init)
         _init
         _status
-        _stop
         _start
         ;;
     status)
         _status
         ;;
     start)
+        _status
+        _start
+        ;;
+    restart)
         _status
         _stop
         _start
@@ -128,7 +128,7 @@ case ${CMD} in
         _status
         _stop
         ;;
-    log)
-        _log
+    *)
+        _status
         ;;
 esac
