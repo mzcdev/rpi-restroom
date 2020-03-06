@@ -1,4 +1,5 @@
 import argparse
+import boto3
 import time
 
 import RPi.GPIO as gpio
@@ -9,38 +10,43 @@ ECHO = 27
 
 INTERVAL = 0.5
 
+AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-1")
+TABLE_NAME = os.environ.get("TABLE_NAME", "restroom-demo")
+
+
+ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
+tbl = ddb.Table(TABLE_NAME)
+
 
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
-    p.add_argument("--trigger", type=None, default=17, help="trigger")
-    p.add_argument("--echo", type=None, default=27, help="echo")
-    p.add_argument("--interval", type=float, default=0.5, help="interval")
+    p.add_argument("--gpio-out", type=int, default=TRIG, help="trigger")
+    p.add_argument("--gpio-in", type=int, default=ECHO, help="echo")
+    p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
 
 
 def main():
-    print("start")
-
-    # args = parse_args()
+    args = parse_args()
 
     gpio.setmode(gpio.BCM)
 
-    gpio.setup(TRIG, gpio.OUT)
-    gpio.setup(ECHO, gpio.IN)
+    gpio.setup(args.gpio_out, gpio.OUT)
+    gpio.setup(args.gpio_in, gpio.IN)
 
     try:
         while True:
-            gpio.output(TRIG, False)
+            gpio.output(args.gpio_out, False)
             time.sleep(INTERVAL)
 
-            gpio.output(TRIG, True)
+            gpio.output(args.gpio_out, True)
             time.sleep(0.00001)
-            gpio.output(TRIG, False)
+            gpio.output(args.gpio_out, False)
 
-            while gpio.input(ECHO) == 0:
+            while gpio.input(args.gpio_in) == 0:
                 continue
             pulse_start = time.time()
 
-            while gpio.input(ECHO) == 1:
+            while gpio.input(args.gpio_in) == 1:
                 continue
             pulse_end = time.time()
 
