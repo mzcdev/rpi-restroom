@@ -52,9 +52,9 @@ class Room:
         self.dist_avg = dist_sum / len(self.dist_list)
 
         if prev_avg > 100 and self.dist_avg < 100:
-            put_item(self.dist_avg)
+            self.put_item(self.dist_avg)
         elif prev_avg < 100 and self.dist_avg > 100:
-            put_item(self.dist_avg)
+            self.put_item(self.dist_avg)
 
         return self.dist_avg
 
