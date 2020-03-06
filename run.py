@@ -1,5 +1,6 @@
 import argparse
 import boto3
+import numpy as np
 import os
 import time
 
@@ -14,11 +15,14 @@ ROOM_ID = os.environ.get("ROOM_ID", "MZ_6F_M_01")
 GPIO_OUT = os.environ.get("GPIO_OUT", "17")
 GPIO_IN = os.environ.get("GPIO_IN", "27")
 
-INTERVAL = os.environ.get("INTERVAL", "0.5")
+INTERVAL = os.environ.get("INTERVAL", "1.0")
 
 
 ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
 tbl = ddb.Table(TABLE_NAME)
+
+distance_list = []
+distance_len = 10
 
 
 def parse_args():
@@ -47,6 +51,16 @@ def put_item(args, distance):
     print("put_item", res)
 
     return res
+
+
+def put_distance(args, distance):
+    distance_list.append(distance)
+    if len(distance_list) > distance_len:
+        del distance_list[0]
+    distance_sum = np.sum(distance_list)
+    distance_avg = distance_sum / len(distance_list)
+
+    put_item(args, distance_avg)
 
 
 def main():
@@ -78,7 +92,7 @@ def main():
             distance = pulse_duration * 17000
             distance = round(distance, 2)
 
-            put_item(args, distance)
+            put_distance(args, distance)
 
             print("Distance", distance, "cm")
     except:
