@@ -9,7 +9,7 @@ import RPi.GPIO as gpio
 AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-2")
 TABLE_NAME = os.environ.get("TABLE_NAME", "restroom-demo")
 
-DEVICE_ID = os.environ.get("DEVICE_ID", "MZ_6F_MAN_01")
+DEVICE_ID = os.environ.get("DEVICE_ID", "MZ_6F_M_01")
 
 GPIO_OUT = os.environ.get("GPIO_OUT", "17")
 GPIO_IN = os.environ.get("GPIO_IN", "27")
@@ -38,10 +38,10 @@ def put_item(args, distance):
 
     try:
         res = tbl.put_item(
-            Item={"device_id": args.device_id, "length": length, "latest": latest}
+            Item={"device_id": args.device_id, "distance": distance, "latest": latest}
         )
     except Exception as ex:
-        print("Error:", ex, DEVICE_ID, length)
+        print("Error:", ex, DEVICE_ID, distance)
         res = []
 
     print("put_item", res)
