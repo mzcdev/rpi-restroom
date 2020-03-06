@@ -24,15 +24,13 @@ def parse_args():
     p.add_argument("--gpio-out", type=int, default=GPIO_OUT, help="gpio-out")
     p.add_argument("--gpio-in", type=int, default=GPIO_IN, help="gpio-in")
     p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
+    return p.parse_args()
 
 
 def main():
     args = parse_args()
 
     gpio.setmode(gpio.BCM)
-
-    print(args)
-    print(args.gpio_out, args.gpio_in, args.interval)
 
     gpio.setup(args.gpio_out, gpio.OUT)
     gpio.setup(args.gpio_in, gpio.IN)
