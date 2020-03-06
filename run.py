@@ -4,6 +4,12 @@ import time
 import RPi.GPIO as gpio
 
 
+TRIG = 17
+ECHO = 27
+
+INTERVAL = 0.5
+
+
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
     p.add_argument("--trigger", type=None, default=17, help="trigger")
@@ -14,27 +20,27 @@ def parse_args():
 def main():
     print("start")
 
-    args = parse_args()
+    # args = parse_args()
 
     gpio.setmode(gpio.BCM)
 
-    gpio.setup(args.trigger, gpio.OUT)
-    gpio.setup(args.echo, gpio.IN)
+    gpio.setup(TRIG, gpio.OUT)
+    gpio.setup(ECHO, gpio.IN)
 
     try:
         while True:
-            gpio.output(args.trigger, False)
-            time.sleep(args.interval)
+            gpio.output(TRIG, False)
+            time.sleep(INTERVAL)
 
-            gpio.output(args.trigger, True)
+            gpio.output(TRIG, True)
             time.sleep(0.00001)
-            gpio.output(args.trigger, False)
+            gpio.output(TRIG, False)
 
-            while gpio.input(args.echo) == 0:
+            while gpio.input(ECHO) == 0:
                 continue
             pulse_start = time.time()
 
-            while gpio.input(args.echo) == 1:
+            while gpio.input(ECHO) == 1:
                 continue
             pulse_end = time.time()
 
