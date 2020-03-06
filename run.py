@@ -27,7 +27,7 @@ def parse_args():
     return p.parse_args()
 
 
-class Distance:
+class Room:
     def __init__(self, args):
         self.args = args
 
@@ -88,7 +88,7 @@ def main():
     ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
     tbl = ddb.Table(TABLE_NAME)
 
-    distance = Distance(args)
+    room = Room(args)
 
     gpio.setmode(gpio.BCM)
 
@@ -116,7 +116,7 @@ def main():
             distance = pulse_duration * 17000
             distance = round(distance, 2)
 
-            distance.set_distance(distance)
+            room.set_distance(distance)
 
             print("Distance", distance, "cm")
     except:
