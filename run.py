@@ -21,9 +21,9 @@ tbl = ddb.Table(TABLE_NAME)
 
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
-    p.add_argument("--gpio-out", type=int, default=GPIO_OUT, help="trigger")
-    p.add_argument("--gpio-in", type=int, default=GPIO_IN, help="echo")
-    p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
+    p.add_argument("gpio-out", type=int, default=GPIO_OUT, help="gpio-out")
+    p.add_argument("gpio-in", type=int, default=GPIO_IN, help="gpio-in")
+    p.add_argument("interval", type=float, default=INTERVAL, help="interval")
 
 
 def main():
