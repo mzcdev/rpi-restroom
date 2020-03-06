@@ -6,13 +6,15 @@ import time
 import RPi.GPIO as gpio
 
 
-GPIO_OUT = 17
-GPIO_IN = 27
-
-INTERVAL = 0.5
-
 AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-2")
 TABLE_NAME = os.environ.get("TABLE_NAME", "restroom-demo")
+
+DEVICE_ID = os.environ.get("DEVICE_ID", "MZ_6F_MAN_01")
+
+GPIO_OUT = os.environ.get("GPIO_OUT", "17")
+GPIO_IN = os.environ.get("GPIO_IN", "27")
+
+INTERVAL = os.environ.get("INTERVAL", "0.5")
 
 
 ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
@@ -21,10 +23,30 @@ tbl = ddb.Table(TABLE_NAME)
 
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
-    p.add_argument("--gpio-out", type=int, default=GPIO_OUT, help="gpio-out")
-    p.add_argument("--gpio-in", type=int, default=GPIO_IN, help="gpio-in")
+    p.add_argument("--device-id", default=DEVICE_ID, help="device id")
+    p.add_argument("--gpio-out", type=int, default=GPIO_OUT, help="gpio out pin no")
+    p.add_argument("--gpio-in", type=int, default=GPIO_IN, help="gpio in pin no")
     p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
     return p.parse_args()
+
+
+def put_item(args, distance):
+    # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
+    # tbl = ddb.Table(TABLE_NAME)
+
+    latest = int(round(time.time() * 1000))
+
+    try:
+        res = tbl.put_item(
+            Item={"device_id": args.device_id, "length": length, "latest": latest}
+        )
+    except Exception as ex:
+        print("Error:", ex, DEVICE_ID, length)
+        res = []
+
+    print("put_item", res)
+
+    return res
 
 
 def main():
@@ -55,6 +77,8 @@ def main():
             pulse_duration = pulse_end - pulse_start
             distance = pulse_duration * 17000
             distance = round(distance, 2)
+
+            put_item(args, distance)
 
             print("Distance", distance, "cm")
     except:

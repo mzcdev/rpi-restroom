@@ -13,5 +13,6 @@ Interfacing Options -> SPI -> Enabled
 ## Install Python Software
 
 ```bash
+pip3 install awscli
 pip3 install boto3
 ```
