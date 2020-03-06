@@ -17,6 +17,8 @@ GPIO_IN = os.environ.get("GPIO_IN", "27")
 
 INTERVAL = os.environ.get("INTERVAL", "1.0")
 
+BOUNDARY = os.environ.get("BOUNDARY", "80.0")
+
 
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
@@ -24,6 +26,7 @@ def parse_args():
     p.add_argument("--gpio-out", type=int, default=GPIO_OUT, help="gpio out pin no")
     p.add_argument("--gpio-in", type=int, default=GPIO_IN, help="gpio in pin no")
     p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
+    p.add_argument("--boundary", type=float, default=BOUNDARY, help="boundary")
     return p.parse_args()
 
 
@@ -51,9 +54,9 @@ class Room:
 
         self.dist_avg = dist_sum / len(self.dist_list)
 
-        if prev_avg > 100 and self.dist_avg < 100:
+        if prev_avg > args.boundary and self.dist_avg < args.boundary:
             self.put_item(self.dist_avg, "x")
-        elif prev_avg < 100 and self.dist_avg > 100:
+        elif prev_avg < args.boundary and self.dist_avg > args.boundary:
             self.put_item(self.dist_avg, "o")
 
         return self.dist_avg
