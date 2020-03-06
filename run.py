@@ -8,7 +8,7 @@ import RPi.GPIO as gpio
 
 
 AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-2")
-TABLE_NAME = os.environ.get("TABLE_NAME", "restroom-demo")
+TABLE_NAME = os.environ.get("TABLE_NAME", "restroom-rooms-demo")
 
 ROOM_ID = os.environ.get("ROOM_ID", "MZ_6F_M_01")
 
