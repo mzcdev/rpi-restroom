@@ -109,8 +109,6 @@ _init() {
 case ${CMD} in
     init)
         _init
-        _status
-        _start
         ;;
     status)
         _status
@@ -130,5 +128,6 @@ case ${CMD} in
         ;;
     *)
         _status
+        _start
         ;;
 esac
