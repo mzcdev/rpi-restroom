@@ -52,13 +52,13 @@ class Room:
         self.dist_avg = dist_sum / len(self.dist_list)
 
         if prev_avg > 100 and self.dist_avg < 100:
-            self.put_item(self.dist_avg)
+            self.put_item(self.dist_avg, "x")
         elif prev_avg < 100 and self.dist_avg > 100:
-            self.put_item(self.dist_avg)
+            self.put_item(self.dist_avg, "o")
 
         return self.dist_avg
 
-    def put_item(self, distance):
+    def put_item(self, distance, available):
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         # tbl = ddb.Table(TABLE_NAME)
 
@@ -67,6 +67,7 @@ class Room:
         item = {
             "room_id": self.args.room_id,
             "distance": int(distance),
+            "available": available,
             "latest": latest,
         }
         print("put_item", item)
