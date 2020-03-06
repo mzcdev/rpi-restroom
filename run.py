@@ -9,7 +9,7 @@ import RPi.GPIO as gpio
 AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-2")
 TABLE_NAME = os.environ.get("TABLE_NAME", "restroom-demo")
 
-DEVICE_ID = os.environ.get("DEVICE_ID", "MZ_6F_M_01")
+ROOM_ID = os.environ.get("ROOM_ID", "MZ_6F_M_01")
 
 GPIO_OUT = os.environ.get("GPIO_OUT", "17")
 GPIO_IN = os.environ.get("GPIO_IN", "27")
@@ -23,7 +23,7 @@ tbl = ddb.Table(TABLE_NAME)
 
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
-    p.add_argument("--device-id", default=DEVICE_ID, help="device id")
+    p.add_argument("--room-id", default=ROOM_ID, help="room id")
     p.add_argument("--gpio-out", type=int, default=GPIO_OUT, help="gpio out pin no")
     p.add_argument("--gpio-in", type=int, default=GPIO_IN, help="gpio in pin no")
     p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
@@ -38,7 +38,7 @@ def put_item(args, distance):
 
     try:
         res = tbl.put_item(
-            Item={"device_id": args.device_id, "distance": distance, "latest": latest}
+            Item={"room_id": args.room_id, "distance": distance, "latest": latest}
         )
     except Exception as ex:
         print("Error:", ex, DEVICE_ID, distance)
