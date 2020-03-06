@@ -11,7 +11,7 @@ GPIO_IN = 27
 
 INTERVAL = 0.5
 
-AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-1")
+AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-2")
 TABLE_NAME = os.environ.get("TABLE_NAME", "restroom-demo")
 
 
@@ -31,13 +31,15 @@ def main():
 
     gpio.setmode(gpio.BCM)
 
+    print(args.gpio_out, args.gpio_in, args.interval)
+
     gpio.setup(args.gpio_out, gpio.OUT)
     gpio.setup(args.gpio_in, gpio.IN)
 
     try:
         while True:
             gpio.output(args.gpio_out, False)
-            time.sleep(INTERVAL)
+            time.sleep(args.interval)
 
             gpio.output(args.gpio_out, True)
             time.sleep(0.00001)
