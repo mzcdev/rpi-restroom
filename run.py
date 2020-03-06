@@ -1,12 +1,13 @@
 import argparse
 import boto3
+import os
 import time
 
 import RPi.GPIO as gpio
 
 
-TRIG = 17
-ECHO = 27
+GPIO_OUT = 17
+GPIO_IN = 27
 
 INTERVAL = 0.5
 
@@ -20,8 +21,8 @@ tbl = ddb.Table(TABLE_NAME)
 
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
-    p.add_argument("--gpio-out", type=int, default=TRIG, help="trigger")
-    p.add_argument("--gpio-in", type=int, default=ECHO, help="echo")
+    p.add_argument("--gpio-out", type=int, default=GPIO_OUT, help="trigger")
+    p.add_argument("--gpio-in", type=int, default=GPIO_IN, help="echo")
     p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
 
 
