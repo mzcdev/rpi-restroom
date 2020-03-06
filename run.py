@@ -54,9 +54,9 @@ class Room:
 
         self.dist_avg = dist_sum / len(self.dist_list)
 
-        if prev_avg > args.boundary and self.dist_avg < args.boundary:
+        if prev_avg > self.args.boundary and self.dist_avg < self.args.boundary:
             self.put_item(self.dist_avg, "x")
-        elif prev_avg < args.boundary and self.dist_avg > args.boundary:
+        elif prev_avg < self.args.boundary and self.dist_avg > self.args.boundary:
             self.put_item(self.dist_avg, "o")
 
         return self.dist_avg
