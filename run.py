@@ -85,9 +85,6 @@ class Room:
 def main():
     args = parse_args()
 
-    ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
-    tbl = ddb.Table(TABLE_NAME)
-
     room = Room(args)
 
     gpio.setmode(gpio.BCM)
