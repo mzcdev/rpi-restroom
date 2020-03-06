@@ -117,9 +117,9 @@ def main():
             distance = pulse_duration * 17000
             distance = round(distance, 2)
 
-            room.set_distance(distance)
+            avg = room.set_distance(distance)
 
-            print("Distance", distance, "cm")
+            print("Distance", distance, avg)
     except:
         gpio.cleanup()
 
