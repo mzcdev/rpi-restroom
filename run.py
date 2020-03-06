@@ -18,13 +18,6 @@ GPIO_IN = os.environ.get("GPIO_IN", "27")
 INTERVAL = os.environ.get("INTERVAL", "1.0")
 
 
-ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
-tbl = ddb.Table(TABLE_NAME)
-
-distance_list = []
-distance_len = 10
-
-
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
     p.add_argument("--room-id", default=ROOM_ID, help="room id")
@@ -34,37 +27,68 @@ def parse_args():
     return p.parse_args()
 
 
-def put_item(args, distance):
-    # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
-    # tbl = ddb.Table(TABLE_NAME)
+class Distance:
+    def __init__(self, args):
+        self.args = args
 
-    latest = int(round(time.time() * 1000))
+        self.dist_list = []
+        self.dist_max = 10
+        self.dist_sum = 0
+        self.dist_avg = 0
 
-    try:
-        res = tbl.put_item(
-            Item={"room_id": args.room_id, "distance": int(distance), "latest": latest}
-        )
-    except Exception as ex:
-        print("Error:", ex, ROOM_ID, distance)
-        res = []
+        ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
+        self.tbl = ddb.Table(TABLE_NAME)
 
-    print("put_item", res)
+    def set_distance(self, distance):
+        prev_avg = self.dist_avg
 
-    return res
+        self.dist_list.append(distance)
 
+        if len(self.dist_list) > self.dist_max:
+            del self.dist_list[0]
 
-def put_distance(args, distance):
-    distance_list.append(distance)
-    if len(distance_list) > distance_len:
-        del distance_list[0]
-    distance_sum = np.sum(distance_list)
-    distance_avg = distance_sum / len(distance_list)
+        dist_sum = np.sum(self.dist_list)
 
-    put_item(args, distance_avg)
+        self.dist_avg = dist_sum / len(self.dist_list)
+
+        if prev_avg > 100 and self.dist_avg < 100:
+            put_item(self.dist_avg)
+        elif prev_avg < 100 and self.dist_avg > 100:
+            put_item(self.dist_avg)
+
+        return self.dist_avg
+
+    def put_item(self, distance):
+        # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
+        # tbl = ddb.Table(TABLE_NAME)
+
+        latest = int(round(time.time() * 1000))
+
+        item = {
+            "room_id": self.args.room_id,
+            "distance": int(distance),
+            "latest": latest,
+        }
+        print("put_item", item)
+
+        try:
+            res = self.tbl.put_item(Item=item)
+        except Exception as ex:
+            print("Error:", ex, ROOM_ID, distance)
+            res = []
+
+        print("put_item", res)
+
+        return res
 
 
 def main():
     args = parse_args()
+
+    ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
+    tbl = ddb.Table(TABLE_NAME)
+
+    distance = Distance(args)
 
     gpio.setmode(gpio.BCM)
 
@@ -92,7 +116,7 @@ def main():
             distance = pulse_duration * 17000
             distance = round(distance, 2)
 
-            put_distance(args, distance)
+            distance.set_distance(distance)
 
             print("Distance", distance, "cm")
     except:
