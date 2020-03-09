@@ -73,8 +73,8 @@ _start() {
 
     pushd ${SHELL_DIR}
     _command "python3 run.py"
-    # nohup python3 run.py > log.out 2>&1 &
-    nohup python3 run.py > /dev/null 2>&1 &
+    nohup python3 run.py > log.out 2>&1 &
+    # nohup python3 run.py > /dev/null 2>&1 &
     popd
 
     _status

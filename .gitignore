@@ -46,3 +46,6 @@ package-lock.json
 
 # Serverless
 .serverless
+
+# log
+log.out
