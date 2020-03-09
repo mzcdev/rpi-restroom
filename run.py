@@ -118,8 +118,13 @@ def main():
             distance = round(distance, 2)
 
             avg = room.set_distance(distance)
+            avg = round(avg, 2)
 
             print("Distance", distance, avg)
+
+            f = open("log.out", "w")
+            f.write("{} , {}".format(distance, avg))
+            f.close()
     except:
         gpio.cleanup()
 
