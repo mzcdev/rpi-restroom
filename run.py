@@ -2,6 +2,7 @@ import argparse
 import boto3
 import numpy as np
 import os
+import socket
 import time
 
 import RPi.GPIO as gpio
@@ -28,6 +29,16 @@ def parse_args():
     p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
     p.add_argument("--boundary", type=float, default=BOUNDARY, help="boundary")
     return p.parse_args()
+
+
+def internet(host="8.8.8.8", port=53, timeout=1):
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except socket.error as ex:
+        print(ex)
+        return False
 
 
 class Room:
@@ -75,13 +86,14 @@ class Room:
         }
         print("put_item", item)
 
-        try:
-            res = self.tbl.put_item(Item=item)
-        except Exception as ex:
-            print("Error:", ex, ROOM_ID, distance)
-            res = []
+        if internet():
+            try:
+                res = self.tbl.put_item(Item=item)
+            except Exception as ex:
+                print("Error:", ex, ROOM_ID, distance)
+                res = []
 
-        print("put_item", res)
+            print("put_item", res)
 
         return res
 
