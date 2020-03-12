@@ -143,7 +143,7 @@ def main():
             if avg < avg_min:
                 avg_min - avg
 
-            print("Distance", distance, avg)
+            print("Distance", distance, avg_min, avg, avg_max)
 
             f = open("log.out", "w")
             f.write("{} , {}".format(distance, avg))
