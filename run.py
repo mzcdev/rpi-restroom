@@ -141,7 +141,7 @@ def main():
             if avg > avg_max:
                 avg_max = avg
             if avg < avg_min:
-                avg_min - avg
+                avg_min = avg
 
             print("Distance", distance, avg_min, avg, avg_max)
 
