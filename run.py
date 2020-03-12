@@ -18,7 +18,7 @@ GPIO_IN = os.environ.get("GPIO_IN", "27")
 
 INTERVAL = os.environ.get("INTERVAL", "1.0")
 
-BOUNDARY = os.environ.get("BOUNDARY", "80.0")
+BOUNDARY = os.environ.get("BOUNDARY", "100.0")
 
 
 def parse_args():
