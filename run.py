@@ -18,7 +18,7 @@ GPIO_IN = os.environ.get("GPIO_IN", "27")
 
 INTERVAL = os.environ.get("INTERVAL", "1.0")
 
-BOUNDARY = os.environ.get("BOUNDARY", "100.0")
+BOUNDARY = os.environ.get("BOUNDARY", "80.0")
 
 
 def parse_args():
@@ -101,7 +101,13 @@ class Room:
 def main():
     args = parse_args()
 
+    # room
     room = Room(args)
+
+    avg_max = 0
+    avg_min = 100
+
+    boundary = args.boundary
 
     gpio.setmode(gpio.BCM)
 
@@ -131,6 +137,11 @@ def main():
 
             avg = room.set_distance(distance)
             avg = round(avg, 2)
+
+            if avg > avg_max:
+                avg_max = avg
+            if avg < avg_min:
+                avg_min - avg
 
             print("Distance", distance, avg)
 
