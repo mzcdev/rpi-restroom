@@ -50,6 +50,9 @@ class Room:
         self.dist_sum = 0
         self.dist_avg = 0
 
+        self.available = "x"
+        self.latest = int(round(time.time() * 1000))
+
         ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         self.tbl = ddb.Table(TABLE_NAME)
 
@@ -66,8 +69,14 @@ class Room:
         self.dist_avg = dist_sum / len(self.dist_list)
 
         if prev_avg > self.args.boundary and self.dist_avg < self.args.boundary:
+            self.available = "x"
+            self.latest = int(round(time.time() * 1000))
+
             self.put_item(self.dist_avg, "x")
         elif prev_avg < self.args.boundary and self.dist_avg > self.args.boundary:
+            self.available = "o"
+            self.latest = int(round(time.time() * 1000))
+
             self.put_item(self.dist_avg, "o")
 
         return self.dist_avg
