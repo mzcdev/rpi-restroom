@@ -146,7 +146,7 @@ def main():
             print("Distance", distance, avg_min, avg, avg_max)
 
             f = open("log.out", "w")
-            f.write("{} , {}".format(distance, avg))
+            f.write("{} , {}".format(distance, avg_min, avg, avg_max))
             f.close()
     except:
         gpio.cleanup()
