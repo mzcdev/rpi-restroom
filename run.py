@@ -90,13 +90,17 @@ class Room:
         return self.dist_avg
 
     def write_log(self, distance):
-        f = open("distance.out", "w")
-        f.write(
-            "{} : {} < {} < {} ".format(
-                distance, self.avg_min, self.dist_avg, self.avg_max
+        try:
+            f = open("distance.out", "w")
+            f.write(
+                "{} : {} < {} < {} ".format(
+                    distance, self.avg_min, self.dist_avg, self.avg_max
+                )
             )
-        )
-        f.close()
+            f.close()
+        except Exception as ex:
+            print("File Error:", ex, ROOM_ID, distance)
+            res = []
 
     def put_item(self, distance):
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
@@ -121,7 +125,7 @@ class Room:
             try:
                 res = self.tbl.put_item(Item=item)
             except Exception as ex:
-                print("Error:", ex, ROOM_ID, distance)
+                print("DDB Error:", ex, ROOM_ID, distance)
                 res = []
 
             print("put_item", res)
