@@ -101,6 +101,8 @@ class Room:
 
         self.put_item()
 
+        self.save()
+
         return self.data.avg
 
     def put_item(self):
