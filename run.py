@@ -167,7 +167,7 @@ def main():
                 continue
             pulse_end = time.time()
 
-            pulse_duration = 100  # pulse_end - pulse_start
+            pulse_duration = pulse_end - pulse_start
             distance = pulse_duration * 17000
             distance = round(distance, 2)
 
