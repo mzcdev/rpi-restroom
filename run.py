@@ -130,6 +130,8 @@ class Room:
                 res = []
 
             print("put_item", res)
+        else:
+            res = []
 
         return res
 
