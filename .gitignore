@@ -50,3 +50,5 @@ package-lock.json
 # log
 distance.out
 nohup.out
+
+data.json

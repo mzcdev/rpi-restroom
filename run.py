@@ -1,11 +1,12 @@
 import argparse
 import boto3
+import json
 import numpy as np
 import os
 import socket
 import time
 
-import RPi.GPIO as gpio
+# import RPi.GPIO as gpio
 
 
 AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-2")
@@ -20,6 +21,8 @@ INTERVAL = os.environ.get("INTERVAL", "3.0")
 
 BOUNDARY = os.environ.get("BOUNDARY", "80.0")
 
+JSON_PATH = os.environ.get("JSON_PATH", "data.json")
+
 
 def parse_args():
     p = argparse.ArgumentParser(description="restroom")
@@ -28,6 +31,7 @@ def parse_args():
     p.add_argument("--gpio-in", type=int, default=GPIO_IN, help="gpio in pin no")
     p.add_argument("--interval", type=float, default=INTERVAL, help="interval")
     p.add_argument("--boundary", type=float, default=BOUNDARY, help="boundary")
+    p.add_argument("--json-path", default=JSON_PATH, help="json path")
     return p.parse_args()
 
 
@@ -45,55 +49,61 @@ class Room:
     def __init__(self, args):
         self.args = args
 
-        self.dist_list = []
-        self.dist_max = 10
-        self.dist_sum = 0
-        self.dist_avg = 0
-
-        self.avg_max = 0
-        self.avg_min = 100
-
-        self.available = "-"
-        self.latest = int(round(time.time() * 1000))
-
         ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         self.tbl = ddb.Table(TABLE_NAME)
 
-    def set_distance(self, distance):
-        prev_avg = self.dist_avg
+        self.load()
 
-        distance = round(distance, 2)
-
-        self.dist_list.append(distance)
-
-        if len(self.dist_list) > self.dist_max:
-            del self.dist_list[0]
-
-        dist_sum = np.sum(self.dist_list)
-
-        self.dist_avg = round(dist_sum / len(self.dist_list), 2)
-
-        if self.dist_avg > self.avg_max:
-            self.avg_max = self.dist_avg
-        if self.dist_avg < self.avg_min:
-            self.avg_min = self.dist_avg
-
-        if self.dist_avg < self.args.boundary:
-            self.available = "x"
-            if prev_avg > self.args.boundary:
-                self.latest = int(round(time.time() * 1000))
+    def load(self):
+        if os.path.isfile(self.args.json_path):
+            f = open(self.args.json_path)
+            self.data = json.load(f)
+            f.close()
         else:
-            self.available = "o"
-            if prev_avg < self.args.boundary:
-                self.latest = int(round(time.time() * 1000))
+            self.data = {
+                "history": [],
+                "length": 10,
+                "max": 10,
+                "min": 0,
+                "sum": 0,
+                "avg": 0,
+                "distance": 0,
+                "available": "-",
+                "latest": int(round(time.time() * 1000)),
+            }
 
-        self.put_item(distance)
+        self.save()
 
-        self.write_log(distance)
+    def save(self):
+        with open(self.args.json_path, "w") as f:
+            json.dump(self.data, f)
 
-        return self.dist_avg
+    def set_distance(self, distance):
+        prev = self.data.avg
 
-    def put_item(self, distance):
+        self.data.distance = round(distance, 2)
+
+        self.data.history.append(self.data.distance)
+        if len(self.data.history) > self.data.length:
+            del self.data.history[0]
+
+        self.data.sum = round(np.sum(self.data.history), 2)
+        self.data.avg = round(self.data.sum / len(self.data.history), 2)
+
+        if self.data.avg < self.args.boundary:
+            self.data.available = "x"
+            if prev > self.args.boundary:
+                self.data.latest = int(round(time.time() * 1000))
+        else:
+            self.data.available = "o"
+            if prev < self.args.boundary:
+                self.data.latest = int(round(time.time() * 1000))
+
+        self.put_item()
+
+        return self.data.avg
+
+    def put_item(self):
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         # tbl = ddb.Table(TABLE_NAME)
 
@@ -101,11 +111,8 @@ class Room:
 
         item = {
             "room_id": self.args.room_id,
-            "available": self.available,
-            "distance": int(distance),
-            "dist_avg": int(self.dist_avg),
-            "avg_max": int(self.avg_max),
-            "avg_min": int(self.avg_min),
+            "available": self.data.available,
+            "distance": int(self.data.distance),
             "latest": self.latest,
             "updated": updated,
         }
@@ -115,25 +122,12 @@ class Room:
             try:
                 res = self.tbl.put_item(Item=item)
             except Exception as ex:
-                print("DDB Error:", ex, ROOM_ID, distance)
+                print("DDB Error:", ex, self.args.room_id, self.data.distance)
                 res = []
 
             print("put_item", res)
 
         return res
-
-    def write_log(self, distance):
-        try:
-            f = open("distance.out", "w")
-            f.write(
-                "{} : {} < {} < {} ".format(
-                    distance, self.avg_min, self.dist_avg, self.avg_max
-                )
-            )
-            f.close()
-        except Exception as ex:
-            print("File Error:", ex, ROOM_ID, distance)
-            res = []
 
 
 def main():
@@ -169,7 +163,6 @@ def main():
             distance = round(distance, 2)
 
             avg = room.set_distance(distance)
-            # avg = round(avg, 2)
 
             print("Distance", distance, avg)
     except:
