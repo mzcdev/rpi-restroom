@@ -16,7 +16,7 @@ ROOM_ID = os.environ.get("ROOM_ID", "MZ_6F_M_01")
 GPIO_OUT = os.environ.get("GPIO_OUT", "17")
 GPIO_IN = os.environ.get("GPIO_IN", "27")
 
-INTERVAL = os.environ.get("INTERVAL", "1.0")
+INTERVAL = os.environ.get("INTERVAL", "3.0")
 
 BOUNDARY = os.environ.get("BOUNDARY", "80.0")
 
@@ -50,7 +50,7 @@ class Room:
         self.dist_sum = 0
         self.dist_avg = 0
 
-        self.available = "x"
+        self.available = "-"
         self.latest = int(round(time.time() * 1000))
 
         ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
@@ -71,27 +71,28 @@ class Room:
         if prev_avg > self.args.boundary and self.dist_avg < self.args.boundary:
             self.available = "x"
             self.latest = int(round(time.time() * 1000))
-
-            self.put_item(self.dist_avg, "x")
         elif prev_avg < self.args.boundary and self.dist_avg > self.args.boundary:
             self.available = "o"
             self.latest = int(round(time.time() * 1000))
 
-            self.put_item(self.dist_avg, "o")
+        self.put_item()
 
         return self.dist_avg
 
-    def put_item(self, distance, available):
+    def put_item(self):
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         # tbl = ddb.Table(TABLE_NAME)
 
-        latest = int(round(time.time() * 1000))
+        distance = int(self.dist_avg)
+
+        updated = int(round(time.time() * 1000))
 
         item = {
             "room_id": self.args.room_id,
-            "distance": int(distance),
-            "available": available,
-            "latest": latest,
+            "distance": distance,
+            "available": self.available,
+            "latest": self.latest,
+            "updated": updated,
         }
         print("put_item", item)
 
