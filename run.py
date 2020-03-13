@@ -115,7 +115,7 @@ class Room:
             "room_id": self.args.room_id,
             "available": self.data.available,
             "distance": int(self.data.distance),
-            "latest": self.latest,
+            "latest": self.data.latest,
             "updated": updated,
         }
         print("put_item", item)
