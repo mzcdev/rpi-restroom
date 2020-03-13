@@ -50,6 +50,9 @@ class Room:
         self.dist_sum = 0
         self.dist_avg = 0
 
+        self.avg_max = 0
+        self.avg_min = 100
+
         self.available = "-"
         self.latest = int(round(time.time() * 1000))
 
@@ -66,7 +69,12 @@ class Room:
 
         dist_sum = np.sum(self.dist_list)
 
-        self.dist_avg = dist_sum / len(self.dist_list)
+        self.dist_avg = int(dist_sum / len(self.dist_list))
+
+        if self.dist_avg > self.avg_max:
+            self.avg_max = self.dist_avg
+        if self.dist_avg < self.avg_min:
+            self.avg_min = self.dist_avg
 
         if prev_avg > self.args.boundary and self.dist_avg < self.args.boundary:
             self.available = "x"
@@ -83,14 +91,15 @@ class Room:
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         # tbl = ddb.Table(TABLE_NAME)
 
-        distance = int(self.dist_avg)
-
         updated = int(round(time.time() * 1000))
 
         item = {
             "room_id": self.args.room_id,
-            "distance": distance,
             "available": self.available,
+            "distance": self.dist_avg,
+            "boundary": self.boundary,
+            "avg_max": self.avg_max,
+            "avg_min": self.avg_min,
             "latest": self.latest,
             "updated": updated,
         }
