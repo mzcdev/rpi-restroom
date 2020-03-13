@@ -6,7 +6,7 @@ import os
 import socket
 import time
 
-# import RPi.GPIO as gpio
+import RPi.GPIO as gpio
 
 
 AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-2")
