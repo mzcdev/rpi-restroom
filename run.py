@@ -76,12 +76,14 @@ class Room:
         if self.dist_avg < self.avg_min:
             self.avg_min = self.dist_avg
 
-        if prev_avg > self.args.boundary and self.dist_avg < self.args.boundary:
+        if self.dist_avg < self.args.boundary:
             self.available = "x"
-            self.latest = int(round(time.time() * 1000))
-        elif prev_avg < self.args.boundary and self.dist_avg > self.args.boundary:
+            if prev_avg > self.args.boundary:
+                self.latest = int(round(time.time() * 1000))
+        else:
             self.available = "o"
-            self.latest = int(round(time.time() * 1000))
+            if prev_avg < self.args.boundary:
+                self.latest = int(round(time.time() * 1000))
 
         self.put_item(distance)
 
