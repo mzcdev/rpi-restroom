@@ -69,7 +69,7 @@ class Room:
 
         dist_sum = np.sum(self.dist_list)
 
-        self.dist_avg = int(dist_sum / len(self.dist_list))
+        self.dist_avg = dist_sum / len(self.dist_list)
 
         if self.dist_avg > self.avg_max:
             self.avg_max = self.dist_avg
@@ -91,19 +91,6 @@ class Room:
 
         return self.dist_avg
 
-    def write_log(self, distance):
-        try:
-            f = open("distance.out", "w")
-            f.write(
-                "{} : {} < {} < {} ".format(
-                    distance, self.avg_min, self.dist_avg, self.avg_max
-                )
-            )
-            f.close()
-        except Exception as ex:
-            print("File Error:", ex, ROOM_ID, distance)
-            res = []
-
     def put_item(self, distance):
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         # tbl = ddb.Table(TABLE_NAME)
@@ -113,11 +100,10 @@ class Room:
         item = {
             "room_id": self.args.room_id,
             "available": self.available,
-            "distance": distance,
-            "dist_avg": self.dist_avg,
-            "boundary": self.boundary,
-            "avg_max": self.avg_max,
-            "avg_min": self.avg_min,
+            "distance": int(distance),
+            "dist_avg": int(self.dist_avg),
+            "avg_max": int(self.avg_max),
+            "avg_min": int(self.avg_min),
             "latest": self.latest,
             "updated": updated,
         }
@@ -133,6 +119,19 @@ class Room:
             print("put_item", res)
 
         return res
+
+    def write_log(self, distance):
+        try:
+            f = open("distance.out", "w")
+            f.write(
+                "{} : {} < {} < {} ".format(
+                    int(distance), self.avg_min, self.dist_avg, self.avg_max
+                )
+            )
+            f.close()
+        except Exception as ex:
+            print("File Error:", ex, ROOM_ID, distance)
+            res = []
 
 
 def main():
@@ -168,7 +167,7 @@ def main():
             distance = round(distance, 2)
 
             avg = room.set_distance(distance)
-            avg = round(avg, 2)
+            # avg = round(avg, 2)
 
             print("Distance", distance, avg)
     except:
