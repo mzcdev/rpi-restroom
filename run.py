@@ -62,6 +62,8 @@ class Room:
     def set_distance(self, distance):
         prev_avg = self.dist_avg
 
+        distance = round(distance, 2)
+
         self.dist_list.append(distance)
 
         if len(self.dist_list) > self.dist_max:
@@ -69,7 +71,7 @@ class Room:
 
         dist_sum = np.sum(self.dist_list)
 
-        self.dist_avg = dist_sum / len(self.dist_list)
+        self.dist_avg = round(dist_sum / len(self.dist_list), 2)
 
         if self.dist_avg > self.avg_max:
             self.avg_max = self.dist_avg
@@ -125,7 +127,7 @@ class Room:
             f = open("distance.out", "w")
             f.write(
                 "{} : {} < {} < {} ".format(
-                    int(distance), self.avg_min, self.dist_avg, self.avg_max
+                    distance, self.avg_min, self.dist_avg, self.avg_max
                 )
             )
             f.close()
