@@ -72,6 +72,8 @@ class Room:
                 "latest": int(round(time.time() * 1000)),
             }
 
+        print(json.dumps(self.data))
+
         self.save()
 
     def save(self):
@@ -80,34 +82,34 @@ class Room:
         f.close()
 
     def set_distance(self, distance):
-        prev = self.data.avg
+        prev = self.data["avg"]
 
-        self.data.distance = round(distance, 2)
+        self.data["distance"] = round(distance, 2)
 
-        self.data.history.append(self.data.distance)
-        if len(self.data.history) > self.data.length:
-            del self.data.history[0]
+        self.data["history"].append(self.data["distance"])
+        if len(self.data["history"]) > self.data["length"]:
+            del self.data["history"][0]
 
-        self.data.sum = round(np.sum(self.data.history), 2)
-        self.data.avg = round(self.data.sum / len(self.data.history), 2)
+        self.data["sum"] = round(np.sum(self.data["history"]), 2)
+        self.data["avg"] = round(self.data["sum"] / len(self.data["history"]), 2)
 
-        if self.data.avg < self.args.boundary:
-            self.data.available = "x"
+        if self.data["avg"] < self.args.boundary:
+            self.data["available"] = "x"
             if prev > self.args.boundary:
-                self.data.latest = int(round(time.time() * 1000))
+                self.data["latest"] = int(round(time.time() * 1000))
         else:
-            self.data.available = "o"
+            self.data["available"] = "o"
             if prev < self.args.boundary:
-                self.data.latest = int(round(time.time() * 1000))
+                self.data["latest"] = int(round(time.time() * 1000))
 
         self.put_item()
 
         self.save()
 
-        return self.data.avg
+        return self.data["avg"]
 
     def put_item(self):
-        print("put_item", self.data.distance)
+        print("put_item", self.data["distance"])
 
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         # tbl = ddb.Table(TABLE_NAME)
@@ -116,9 +118,9 @@ class Room:
 
         item = {
             "room_id": self.args.room_id,
-            "available": self.data.available,
-            "distance": int(self.data.distance),
-            "latest": self.data.latest,
+            "available": self.data["available"],
+            "distance": int(self.data["distance"]),
+            "latest": self.data["latest"],
             "updated": updated,
         }
         print("put_item", item)
@@ -127,7 +129,7 @@ class Room:
             try:
                 res = self.tbl.put_item(Item=item)
             except Exception as ex:
-                print("DDB Error:", ex, self.args.room_id, self.data.distance)
+                print("DDB Error:", ex, self.args.room_id, self.data["distance"])
                 res = []
 
             print("put_item", res)
@@ -165,7 +167,7 @@ def main():
                 continue
             pulse_end = time.time()
 
-            pulse_duration = pulse_end - pulse_start
+            pulse_duration = 100  # pulse_end - pulse_start
             distance = pulse_duration * 17000
             distance = round(distance, 2)
 
