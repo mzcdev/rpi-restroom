@@ -48,5 +48,5 @@ package-lock.json
 .serverless
 
 # log
-log.out
+distance.out
 nohup.out

@@ -83,11 +83,22 @@ class Room:
             self.available = "o"
             self.latest = int(round(time.time() * 1000))
 
-        self.put_item()
+        self.put_item(distance)
+
+        self.write_log(distance)
 
         return self.dist_avg
 
-    def put_item(self):
+    def write_log(self, distance):
+        f = open("distance.out", "w")
+        f.write(
+            "{} : {} < {} < {} ".format(
+                distance, self.avg_min, self.dist_avg, self.avg_max
+            )
+        )
+        f.close()
+
+    def put_item(self, distance):
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         # tbl = ddb.Table(TABLE_NAME)
 
@@ -96,7 +107,8 @@ class Room:
         item = {
             "room_id": self.args.room_id,
             "available": self.available,
-            "distance": self.dist_avg,
+            "distance": distance,
+            "dist_avg": self.dist_avg,
             "boundary": self.boundary,
             "avg_max": self.avg_max,
             "avg_min": self.avg_min,
@@ -123,13 +135,8 @@ def main():
     # room
     room = Room(args)
 
-    avg_max = 0
-    avg_min = 100
-
-    boundary = args.boundary
-
+    # gpio
     gpio.setmode(gpio.BCM)
-
     gpio.setup(args.gpio_out, gpio.OUT)
     gpio.setup(args.gpio_in, gpio.IN)
 
@@ -157,16 +164,7 @@ def main():
             avg = room.set_distance(distance)
             avg = round(avg, 2)
 
-            if avg > avg_max:
-                avg_max = avg
-            if avg < avg_min:
-                avg_min = avg
-
-            print("Distance", distance, avg_min, avg, avg_max)
-
-            f = open("log.out", "w")
-            f.write("{} : {} < {} < {} ".format(distance, avg_min, avg, avg_max))
-            f.close()
+            print("Distance", distance, avg)
     except:
         gpio.cleanup()
 
