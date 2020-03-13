@@ -106,6 +106,8 @@ class Room:
         return self.data.avg
 
     def put_item(self):
+        print("put_item", self.data.distance)
+
         # ddb = boto3.resource("dynamodb", region_name=AWS_REGION)
         # tbl = ddb.Table(TABLE_NAME)
 
