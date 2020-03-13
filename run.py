@@ -77,6 +77,7 @@ class Room:
     def save(self):
         with open(self.args.json_path, "w") as f:
             json.dump(self.data, f)
+        f.close()
 
     def set_distance(self, distance):
         prev = self.data.avg
