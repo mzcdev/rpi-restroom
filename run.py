@@ -120,6 +120,7 @@ class Room:
             "room_id": self.args.room_id,
             "available": self.data["available"],
             "distance": int(self.data["distance"]),
+            "average": int(self.data["avg"]),
             "latest": self.data["latest"],
             "updated": updated,
         }
