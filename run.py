@@ -10,6 +10,9 @@ import time
 
 import RPi.GPIO as gpio
 
+from pathlib import Path
+
+HOME = str(Path.home())
 
 AWS_REGION = os.environ.get("AWSREGION", "ap-northeast-2")
 TABLE_NAME = os.environ.get("TABLE_NAME", "restroom-rooms-demo")
@@ -23,7 +26,7 @@ INTERVAL = os.environ.get("INTERVAL", "3.0")
 
 BOUNDARY = os.environ.get("BOUNDARY", "91.0")
 
-JSON_PATH = os.environ.get("JSON_PATH", "data.json")
+JSON_PATH = os.environ.get("JSON_PATH", "{}/.restroom.json".format(HOME))
 
 
 def parse_args():
