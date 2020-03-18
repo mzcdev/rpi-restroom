@@ -76,15 +76,13 @@ class Room:
                 "available": "-",
                 "latest": int(round(time.time() * 1000)),
             }
-
-        print(json.dumps(self.data))
-
         self.save()
 
     def save(self):
         with open(self.args.json_path, "w") as f:
             json.dump(self.data, f)
         f.close()
+        print(json.dumps(self.data))
 
     def set_distance(self, distance):
         prev = self.data["avg"]
