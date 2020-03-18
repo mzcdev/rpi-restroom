@@ -21,7 +21,7 @@ GPIO_IN = os.environ.get("GPIO_IN", "27")
 
 INTERVAL = os.environ.get("INTERVAL", "3.0")
 
-BOUNDARY = os.environ.get("BOUNDARY", "85.0")
+BOUNDARY = os.environ.get("BOUNDARY", "91.0")
 
 JSON_PATH = os.environ.get("JSON_PATH", "data.json")
 
